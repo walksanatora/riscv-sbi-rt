@@ -140,7 +140,7 @@ _abs_start:
 _start_abort:
     wfi
     j   _start_abort
-"#
+"
 );
 
 #[doc(hidden)]
