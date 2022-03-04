@@ -1,7 +1,7 @@
 //! A mininal runtime / startup for Supervisor Binary Interface (SBI) implementations on RISC-V.
 
 #![no_std]
-#![feature(llvm_asm, global_asm)]
+#![feature(global_asm)]
 #![feature(alloc_error_handler)]
 #![deny(warnings, missing_docs)]
 
@@ -10,6 +10,7 @@ extern crate alloc;
 pub use riscv_sbi_rt_macros::{boot_page_sv32, boot_page_sv39, boot_page_sv48};
 pub use riscv_sbi_rt_macros::{entry, interrupt, pre_init};
 
+use core::arch::{global_asm,asm};
 use core::alloc::Layout;
 use core::panic::PanicInfo;
 use core::sync::atomic::*;
@@ -180,7 +181,7 @@ fn oom(layout: Layout) -> ! {
 fn halt() -> ! {
     loop {
         unsafe {
-            llvm_asm!("wfi");
+            asm!("wfi");
         }
     }
 }
