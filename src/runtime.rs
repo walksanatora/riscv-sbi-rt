@@ -29,7 +29,7 @@ extern "C" {
     fn main(hartid: usize, dtb: usize);
 }
 
-global_asm!(
+core::arch::global_asm!(
     r#"
     .section .text.entry
     .globl _start
@@ -78,7 +78,7 @@ fn oom(layout: Layout) -> ! {
 fn halt() -> ! {
     loop {
         unsafe {
-            llvm_asm!("wfi");
+            core::arch::asm!("wfi");
         }
     }
 }

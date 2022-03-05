@@ -9,5 +9,5 @@ edition = "2018"
 [dependencies]
 log = "0.4"
 spin = "0.5.2"
-linked_list_allocator = "0.8.1"
+linked_list_allocator = "0.9"
 opensbi-rt-macros = { path = "macros", version = "0.1.0" }

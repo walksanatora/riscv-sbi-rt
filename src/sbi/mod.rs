@@ -1,5 +1,7 @@
 //! [RISC-V Supervisor Binary Interface (SBI)](https://github.com/riscv/riscv-sbi-doc/blob/master/riscv-sbi.adoc)
 
+use core::arch::asm;
+
 pub mod base;
 pub mod legacy;
 
@@ -45,16 +47,30 @@ impl From<SBIReturn> for SBIResult<usize> {
 
 #[inline(always)]
 fn sbi_call(ext_id: usize, func_id: usize, arg0: usize, arg1: usize, arg2: usize) -> SBIReturn {
-    let error;
+    let error: isize;
     let value;
     unsafe {
-        llvm_asm!(
-            "ecall"
-            : "={x10}" (error), "={x11}"(value)
-            : "{x10}" (arg0), "{x11}" (arg1), "{x12}" (arg2), "{x16}"(func_id), "{x17}" (ext_id)
-            : "memory"
-            : "volatile"
+        asm!(
+            "ecall",
+            lateout("a0") error,
+            lateout("a1") value,
+            in("a0") arg0,
+            in("a1") arg1,
+            in("a2") arg2,
+            in("a6") func_id,
+            in("a7") ext_id,
+            options(nostack)
         );
     }
+    let error = match error {
+        0 => SBIError::Success,
+        -1 => SBIError::Failed,
+        -2 => SBIError::NotSupported,
+        -3 => SBIError::InvalidParam,
+        -4 => SBIError::Denied,
+        -5 => SBIError::InvalidAddress,
+        -6 => SBIError::AlreadyAvailable,
+        error => panic!("invalid error value: {}", error),
+    };
     SBIReturn { error, value }
 }

@@ -1,17 +1,25 @@
 //! [Legacy SBI Extension (v0.1)](https://github.com/riscv/riscv-sbi-doc/blob/master/riscv-sbi.adoc#legacy-sbi-extension-extension-ids-0x00-through-0x0f)
 
+use core::arch::asm;
+
+
 #[inline(always)]
 fn sbi_call(which: usize, arg0: usize, arg1: usize, arg2: usize) -> usize {
     let ret;
     unsafe {
-        llvm_asm!("ecall"
-            : "={x10}" (ret)
-            : "{x10}" (arg0), "{x11}" (arg1), "{x12}" (arg2), "{x17}" (which)
-            : "memory"
-            : "volatile");
+        asm!(
+            "ecall",
+            lateout("a0") ret,
+            in("a0") arg0,
+            in("a1") arg1,
+            in("a2") arg2,
+            in("a7") which,
+            options(nostack)
+        );
     }
     ret
 }
+
 
 /// Write data present in `ch` to debug console.
 ///
