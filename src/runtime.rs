@@ -52,11 +52,11 @@ bootstacktop:
 "#
 );
 
-#[panic_handler]
-fn panic(info: &PanicInfo) -> ! {
-    println!("{}", info);
-    halt();
-}
+// #[panic_handler]
+// fn panic(info: &PanicInfo) -> ! {
+    // println!("{}", info);
+    // halt();
+// }
 
 #[no_mangle]
 extern "C" fn abort() -> ! {
